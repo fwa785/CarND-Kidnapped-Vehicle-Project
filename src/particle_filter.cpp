@@ -124,6 +124,9 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     Particle *p = &particles[i];
     vector<LandmarkObs> predicted;
     vector<LandmarkObs> map_observations;
+    vector<int> associations;
+    vector<double> sense_x;
+    vector<double> sense_y;
 
     // Find the predicated landmarks for this partical within the sensor range
     for (int j = 0; j < map_landmarks.landmark_list.size(); j++) {
@@ -134,8 +137,12 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
       double d = dist(p->x, p->y, lm.x, lm.y);
       if (d <= sensor_range) {
         predicted.push_back(lm);
+        associations.push_back(lm.id);
+        sense_x.push_back(lm.x);
+        sense_y.push_back(lm.y);
       }
     }
+    SetAssociations(particles[i], associations, sense_x, sense_y);
 
     // Convert the observations from the VEHICLE's coordinate system to the MAP's coordinate system
     for (int j = 0; j < observations.size(); j++) {
